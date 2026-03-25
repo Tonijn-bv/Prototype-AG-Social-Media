@@ -1,0 +1,29 @@
+
+TITLE 16X9: 
+Verzekeringen, saai? Integendeel!
+*ik leer elke dag bij*
+SUBTITLE 16X9: Margaux, dossierbeheerder
+BASELINE 16X9: 
+Ontdek alles over jobs 
+in dossierbeheerder bij AG
+
+
+TITLE 1X1: 
+Verzekeringen, saai? 
+Integendeel!
+*ik leer elke dag bij*
+SUBTITLE 1X1: Margaux, dossierbeheerder
+BASELINE 1X1: 
+Ontdek alles over jobs 
+in dossierbeheerder bij AG
+
+
+TITLE 9X16: 
+Verzekeringen,
+saai? Integendeel!
+*ik leer elke dag bij*
+SUBTITLE 9X16: Margaux, dossierbeheerder
+BASELINE 9X16: 
+Ontdek alles over jobs in
+dossierbeheerder bij AG
+

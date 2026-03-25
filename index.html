@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AG Social Media Clips</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+  <!-- ── Toolbar ── -->
+  <header id="toolbar">
+
+    <!-- Format toggle: switch between 16:9 and 1:1 canvas -->
+    <div class="toolbar-group" id="format-toggle-group">
+      <span class="toolbar-label">Format</span>
+      <button id="btn-16x9" class="format-btn active">16:9</button>
+      <button id="btn-1x1"  class="format-btn">1:1</button>
+      <button id="btn-9x16" class="format-btn">9:16</button>
+    </div>
+
+    <!-- Asset loader: Option A — directory picker -->
+    <div class="toolbar-group" id="load-group">
+      <label for="folder-input" class="toolbar-btn load-label">&#128193; Load Watch Folder</label>
+      <input type="file" id="folder-input" webkitdirectory multiple>
+    </div>
+
+    <!-- Playback controls -->
+    <div class="toolbar-group" id="playback-group">
+      <button id="btn-play"  class="toolbar-btn" disabled>&#9654; Play</button>
+      <button id="btn-reset" class="toolbar-btn" disabled>&#8635; Reset</button>
+    </div>
+
+    <!-- Export -->
+    <div class="toolbar-group" id="export-group">
+      <button id="btn-record" class="toolbar-btn record-btn" disabled>&#9210; Record &amp; Export</button>
+    </div>
+
+  </header>
+
+  <!-- ── Preview canvas ── -->
+  <main id="preview-container">
+    <canvas id="preview-canvas"></canvas>
+
+    <!-- Shown until assets are loaded -->
+    <div id="placeholder">
+      <p>Load the <strong>watchfolder/</strong> directory to preview your clip.</p>
+      <p class="hint">Click "Load Watch Folder" above and select the watchfolder directory.</p>
+    </div>
+  </main>
+
+  <!-- ── Status bar ── -->
+  <footer id="status-bar">
+    <span id="status-text">Ready — load the watch folder to begin.</span>
+  </footer>
+
+  <!-- Scripts: loaded in dependency order -->
+  <script src="src/watcher.js"></script>
+  <script src="src/composer.js"></script>
+  <script src="src/exporter.js"></script>
+  <script src="src/ui.js"></script>
+  <script src="src/main.js"></script>
+
+</body>
+</html>
