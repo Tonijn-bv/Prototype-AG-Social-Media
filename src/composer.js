@@ -60,11 +60,50 @@ const Composer = (() => {
   /** Total clip length in milliseconds (animations finish at 2 s, clip holds until 8 s). */
   const TOTAL_DURATION_MS = 8000;
 
+  // ── SVG curved-line path (from docs/CurvedLine.svg) ──────────────────────
+
+  /**
+   * Path data extracted from docs/CurvedLine.svg (viewBox 0 0 3471.94 1008).
+   * Drawn on the canvas with ctx.scale so the shape fills the canvas correctly.
+   */
+  const CURVED_LINE_PATH   = 'M580.14,911.71h-264.2v-63.91h264.2c54.14,0,79.65-12.7,107.78-36.13,36.73-30.6,76.09-50.97,148.8-50.97l2635.23-.22v62.92l-2635.23,1.21c-54.14,0-79.65,12.7-107.78,36.13-36.73,30.6-76.09,50.98-148.8,50.98Z';
+  const CURVED_LINE_SVG_H  = 1008;     // SVG viewBox height (used for uniform scaling)
+  const CURVED_LINE_OPACITY = 0.65;    // <g> opacity from the SVG source
+
+  /**
+   * Gradient stop positions (0–1) and their opacity values, taken directly
+   * from the linearGradient in CurvedLine.svg.
+   * The fill colour changes per brand-colour selection; only opacity varies.
+   */
+  const CURVED_LINE_GRAD = [
+    { offset: 0,    alpha: 1.00 },
+    { offset: 0.52, alpha: 0.88 },
+    { offset: 0.54, alpha: 0.80 },
+    { offset: 0.57, alpha: 0.61 },
+    { offset: 0.63, alpha: 0.30 },
+    { offset: 0.67, alpha: 0.00 },
+  ];
+
+  // Gradient start/end x coordinates in SVG units (horizontal gradient, y is constant)
+  const CURVED_LINE_GRAD_X1 = 315.93;
+  const CURVED_LINE_GRAD_X2 = 3471.94;
+  const CURVED_LINE_GRAD_Y  = 836.09;
+
   // ── Module state ──────────────────────────────────────────────────────────
 
   let canvasElement      = null;  // HTMLCanvasElement
   let ctx                = null;  // CanvasRenderingContext2D
   let currentFormat      = '16x9';
+
+  // ── Brand colour state (Phase 2) ─────────────────────────────────────────
+  // Both values are updated together by the colour picker in the sidebar.
+  // Default: Green Corporate (#99cc00).
+
+  /** Colour used for *highlighted* keywords in the title text. */
+  let currentHighlightColor = '#99cc00';
+
+  /** Fill colour used for the SVG curved-line element. */
+  let currentLineColor      = '#99cc00';
   let currentAssets      = {};    // { background, curvedline, person, logo } — HTMLImageElements
   let currentContent     = null;  // Parsed content: { titleLines, subtitle, baselineLines }
   let currentRawContent  = null;  // Raw content.txt text — kept so format switches can re-parse
@@ -88,6 +127,21 @@ const Composer = (() => {
    */
   function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
+  }
+
+  /**
+   * Converts a 6-digit hex colour string and an alpha value to an rgba() string.
+   * Used to build canvas linear gradients with the active brand colour.
+   *
+   * @param {string} hex   - Colour in '#rrggbb' format.
+   * @param {number} alpha - Opacity 0–1.
+   * @returns {string} e.g. 'rgba(153,204,0,0.88)'
+   */
+  function hexToRgba(hex, alpha) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
   }
 
   /**
@@ -157,26 +211,27 @@ const Composer = (() => {
       // isSquare flag used for the 1:1 baseline yTop override.
       ...(h > w ? {
         // ── 9:16 portrait layout (1080 × 1920) ──
-        // x uses 55px — same absolute left padding as the 1:1 format (88 * 1200/1920).
+        // All values scaled ×1.25 vs. the original portrait baseline so that
+        // text and spacing appear proportionally larger on the tall canvas.
         title: {
-          x          : 75,
-          y          : 300,           // absolute px — upper portion of the tall canvas
-          fontSize   : 68,            // sized for 1080px width
-          lineHeight : 85,            // 1.25× font size
-          slideOffset: Math.round(80 * sx),
+          x          : 94,
+          y          : 375,           // absolute px — upper portion of the tall canvas
+          fontSize   : 85,            // 68 × 1.25
+          lineHeight : 106,           // 85 × 1.25
+          slideOffset: Math.round(100 * sx),
         },
         subtitle: {
-          x          : 75,
-          fontSize   : 42,
-          gapFromTitle: 65,           // comfortable gap below title block
+          x          : 94,
+          fontSize   : 53,            // 42 × 1.25
+          gapFromTitle: 81,           // 65 × 1.25
         },
         baseline: {
-          x          : 75,
-          yTop       : 850,           // absolute px — mid-frame on 1920px canvas
-          fontSize   : 48,
-          boxHeight  : 58,
-          lineGap    : Math.round(6  * sy),
-          paddingX   : Math.round(11 * sx),
+          x          : 94,
+          yTop       : 1063,          // 850 × 1.25 — mid-frame on 1920px canvas
+          fontSize   : 60,            // 48 × 1.25
+          boxHeight  : 73,            // 58 × 1.25
+          lineGap    : Math.round(8  * sy),
+          paddingX   : Math.round(14 * sx),
         },
       } : {
         // ── 16:9 and 1:1 layout (scaled from 1920 × 1080 reference) ──
@@ -433,49 +488,70 @@ const Composer = (() => {
   }
 
   /**
-   * Layer 2 — CurvedLine: transparent PNG that slides up from below the frame
-   * while fading in, over 0 – 800 ms.
+   * Layer 2 — CurvedLine: draws the SVG path from docs/CurvedLine.svg onto the
+   * canvas, filled with a horizontal gradient in the active brand colour.
+   * Slides up from below the frame while fading in, over 0 – 800 ms.
    *
-   * If the image is full-canvas size (naturalWidth ≥ canvas width * 0.9),
-   * it is drawn as a full-canvas overlay. Otherwise it is scaled to fit the
-   * left side while maintaining its aspect ratio.
+   * Approach: the SVG has a viewBox of 3471.94 × 1008. We apply ctx.scale so
+   * that the SVG coordinate space maps exactly onto the canvas dimensions, then
+   * draw the path and gradient in SVG units. This preserves the exact shape and
+   * gradient proportions at any canvas resolution.
+   *
+   * In 9:16 format the element is shifted 25 % to the left (same offset used
+   * by the previous bitmap version) to follow the background/person composition.
    *
    * @param {number} progress - Eased progress 0 (off screen) → 1 (final position).
-   * @param {number} w        - Canvas width.
-   * @param {number} h        - Canvas height.
+   * @param {number} w        - Canvas width in pixels.
+   * @param {number} h        - Canvas height in pixels.
    */
   function drawCurvedLine(progress, w, h) {
-    if (!currentAssets.curvedline || progress === 0) return;
+    if (progress === 0) return;
 
-    const img     = currentAssets.curvedline;
-    const layout  = getLayout(w, h);
-    ctx.globalAlpha = progress; // fade in
+    ctx.save();
 
-    // Determine display size
-    let displayW, displayH, drawX;
+    // Use a UNIFORM scale based on canvas height only.
+    // The SVG viewBox (3471.94 × 1008) is much wider than the canvas — this is
+    // intentional: the shape anchors to the left edge and bleeds off the right,
+    // exactly as the original 1920 × 1080 PNG did.
+    // Using separate scaleX / scaleY would squish the shape horizontally.
+    const scale = h / CURVED_LINE_SVG_H;
+    ctx.scale(scale, scale);
 
-    if (img.naturalWidth >= w * 0.9) {
-      // Full-canvas transparent PNG: scale proportionally to fill canvas height,
-      // anchor to the left edge — any horizontal overflow bleeds off the right side.
-      // In 9:16 format shift 25% of canvas width to the left to follow the
-      // background/person composition.
-      displayH = h;
-      displayW = (img.naturalWidth / img.naturalHeight) * h;
-      drawX    = currentFormat === '9x16' ? -w * 0.25 : 0;
-    } else {
-      // Small decorative asset: scale to maxDisplayH, keep aspect ratio
-      displayH = Math.min(img.naturalHeight, layout.curvedLine.maxDisplayH);
-      displayW = (img.naturalWidth / img.naturalHeight) * displayH;
-      drawX    = 0; // left edge
-    }
+    // Align left edge: the path's leftmost point is at x = CURVED_LINE_GRAD_X1
+    // (315.93 SVG units). Shifting by that amount places the shape flush with
+    // the left edge of the canvas.
+    // Format-specific offsets shift the shape further left so the visible
+    // portion of the curve suits the composition of each aspect ratio.
+    const formatOffset = currentFormat === '9x16' ? (-w * 0.40) / scale
+                       : currentFormat === '1x1'  ? (-w * 0.10) / scale
+                       : 0;
+    ctx.translate(-CURVED_LINE_GRAD_X1 + formatOffset, 0);
 
-    // Slide up: starts below the canvas, ends at its final vertical position
-    const finalY  = h - displayH; // bottom-anchored
-    const startY  = h;            // just off the bottom edge
-    const currentY = lerp(startY, finalY, progress);
+    // Slide up animation: the whole SVG-space is translated vertically.
+    // finalY = 0 (shape at its designed position); startY = CURVED_LINE_SVG_H
+    // (shape sits one full SVG height below, i.e. off the bottom of the canvas).
+    const slideY = lerp(CURVED_LINE_SVG_H, 0, progress);
+    ctx.translate(0, slideY);
 
-    ctx.drawImage(img, drawX, currentY, displayW, displayH);
-    ctx.globalAlpha = 1;
+    // Build horizontal linear gradient in SVG-space coordinates using the
+    // active brand colour. The stop positions and opacities come directly
+    // from the linearGradient in CurvedLine.svg.
+    const grad = ctx.createLinearGradient(
+      CURVED_LINE_GRAD_X1, CURVED_LINE_GRAD_Y,
+      CURVED_LINE_GRAD_X2, CURVED_LINE_GRAD_Y
+    );
+    CURVED_LINE_GRAD.forEach(stop => {
+      grad.addColorStop(stop.offset, hexToRgba(currentLineColor, stop.alpha));
+    });
+
+    // Apply the SVG <g> group opacity combined with the fade-in progress.
+    ctx.globalAlpha = CURVED_LINE_OPACITY * progress;
+    ctx.fillStyle   = grad;
+
+    // Draw the path from the SVG <path d="…"> element.
+    ctx.fill(new Path2D(CURVED_LINE_PATH));
+
+    ctx.restore();
   }
 
   /**
@@ -555,7 +631,8 @@ const Composer = (() => {
 
       let drawX = currentX;
       for (const segment of segments) {
-        ctx.fillStyle = segment.highlight ? '#D4F9B0' : '#FFFFFF';
+        // Use the active brand colour for highlighted keywords; plain white otherwise.
+        ctx.fillStyle = segment.highlight ? currentHighlightColor : '#FFFFFF';
         ctx.fillText(segment.text, drawX, lineY);
         drawX += ctx.measureText(segment.text).width;
       }
@@ -827,7 +904,7 @@ const Composer = (() => {
 
     audioElement      = new Audio();
     audioElement.src  = URL.createObjectURL(audioFile);
-    audioElement.loop = true;
+    audioElement.loop = false;
   }
 
   /**
@@ -1095,6 +1172,49 @@ const Composer = (() => {
     return TOTAL_DURATION_MS;
   }
 
+  // ── Phase 2: brand colour + direct content API ────────────────────────────
+
+  /**
+   * Sets the colour used for *highlighted* title keywords and redraws the
+   * current static frame so the change is visible immediately.
+   * Called by the colour picker in the sidebar.
+   *
+   * @param {string} hex - Colour in '#rrggbb' format.
+   */
+  function setHighlightColor(hex) {
+    currentHighlightColor = hex;
+    if (!playing) drawFrame(currentContent ? TOTAL_DURATION_MS : 0);
+  }
+
+  /**
+   * Sets the fill colour for the SVG curved-line element and redraws.
+   * Called by the colour picker in the sidebar (usually together with
+   * setHighlightColor so both elements share the same brand colour).
+   *
+   * @param {string} hex - Colour in '#rrggbb' format.
+   */
+  function setLineColor(hex) {
+    currentLineColor = hex;
+    if (!playing) drawFrame(currentContent ? TOTAL_DURATION_MS : 0);
+  }
+
+  /**
+   * Replaces the raw content string (previously sourced from content.txt) with
+   * the text entered directly in the sidebar input fields, then re-parses and
+   * redraws the current frame.
+   *
+   * The string must follow the same format as content.txt:
+   *   TITLE 16X9: …   SUBTITLE 16X9: …   BASELINE 16X9: …
+   *   TITLE 1X1: …    etc.
+   *
+   * @param {string} rawText - Full content string built from the sidebar fields.
+   */
+  function setRawContent(rawText) {
+    currentRawContent = rawText;
+    currentContent    = parseContent(currentRawContent, currentFormat);
+    if (!playing) drawFrame(currentContent ? TOTAL_DURATION_MS : 0);
+  }
+
   return {
     init,
     setAssets,
@@ -1105,9 +1225,13 @@ const Composer = (() => {
     getCanvas,
     getAudioStream,
     setAudioLoop,
-    isPlaying     : isAnimationPlaying,
+    isPlaying        : isAnimationPlaying,
     onComplete,
     getTotalDuration,
+    // Phase 2 — brand colour + direct content
+    setHighlightColor,
+    setLineColor,
+    setRawContent,
   };
 
 })();

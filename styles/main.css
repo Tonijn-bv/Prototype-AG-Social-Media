@@ -184,6 +184,217 @@ body {
   50%       { opacity: 0.6; }
 }
 
+/* ── Main area (sidebar + canvas) ─────────────────────────────────────────── */
+
+#main-area {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Sidebar ──────────────────────────────────────────────────────────────── */
+
+#sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
+  background-color: #181818;
+  border-right: 1px solid #2e2e2e;
+}
+
+/* Each collapsible section in the sidebar */
+.sidebar-panel {
+  padding: 16px 14px;
+  border-bottom: 1px solid #2e2e2e;
+}
+
+/* Section heading */
+.panel-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #888888;
+  margin-bottom: 4px;
+}
+
+/* Descriptive hint under a panel title */
+.panel-hint {
+  font-size: 11px;
+  color: #555555;
+  margin-bottom: 10px;
+}
+
+/* ── Colour swatches ──────────────────────────────────────────────────────── */
+
+#color-swatches {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+/* Individual swatch button */
+.color-swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 5px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.1s, border-color 0.15s;
+}
+
+.color-swatch:hover {
+  transform: scale(1.1);
+}
+
+/* Active / selected swatch gets a white ring */
+.color-swatch.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 1px #ffffff44;
+}
+
+/* Row showing the hex code of the selected colour */
+#selected-color-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* Small colour dot next to the hex label */
+#selected-color-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+#selected-color-hex {
+  font-size: 12px;
+  font-family: 'Geogrotesque', monospace, sans-serif;
+  color: #aaaaaa;
+}
+
+/* ── Content tabs ─────────────────────────────────────────────────────────── */
+
+#content-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.content-tab {
+  flex: 1;
+  padding: 5px 0;
+  font-family: 'Geogrotesque', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #888888;
+  background-color: #222222;
+  border: 1px solid #333333;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.12s, color 0.12s;
+}
+
+.content-tab:hover {
+  background-color: #2e2e2e;
+  color: #cccccc;
+}
+
+.content-tab.active {
+  background-color: #A4CB3F;
+  color: #000000;
+  border-color: #A4CB3F;
+}
+
+/* ── Content panes ────────────────────────────────────────────────────────── */
+
+/* Hidden by default; only the active pane is shown */
+.content-pane {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.content-pane.active {
+  display: flex;
+}
+
+/* Field label */
+.field-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #666666;
+  margin-top: 4px;
+}
+
+/* Row wrapping a textarea + highlight button */
+.field-row {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+/* Text area for title / subtitle / baseline */
+.content-field {
+  width: 100%;
+  background-color: #222222;
+  color: #dddddd;
+  border: 1px solid #333333;
+  border-radius: 4px;
+  padding: 7px 9px;
+  font-family: 'Geogrotesque', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.content-field:focus {
+  border-color: #A4CB3F;
+}
+
+.content-field::placeholder {
+  color: #444444;
+}
+
+/* Highlight button: marks selected text with *asterisks* */
+.highlight-btn {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  font-family: 'Geogrotesque', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #000000;
+  background-color: #99cc00;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.12s;
+  margin-top: 1px;
+}
+
+.highlight-btn:hover {
+  background-color: #aadd11;
+}
+
+.highlight-btn:active {
+  background-color: #88bb00;
+}
+
 /* ── Preview area ─────────────────────────────────────────────────────────── */
 
 #preview-container {

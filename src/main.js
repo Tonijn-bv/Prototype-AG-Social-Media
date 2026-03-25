@@ -66,6 +66,10 @@
       // Composer will parse content.txt and draw the end-state frame immediately.
       Composer.setAssets(images, audioFile, contentText);
 
+      // Pre-fill the sidebar text fields with the content from content.txt so
+      // the user can see and edit the loaded text straight away.
+      UI.populateFromContent(contentText);
+
       // Enable playback and export buttons now that we have assets
       UI.enableControls();
 

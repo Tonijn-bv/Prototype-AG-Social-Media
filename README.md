@@ -2,6 +2,8 @@
 
 Browser-based animation composer that layers assets (images, text, logo, audio) into short animated clips, exportable as `.mp4` (H.264) or `.webm` video. No server required — runs entirely in the browser as a local file.
 
+**Phase 2 adds:** brand colour picker, sidebar text input fields (replaces `content.txt` editing), and an SVG-based curved line that recolours with the picker.
+
 ---
 
 ## How to run
@@ -105,7 +107,7 @@ Each format reads its own content section from `content.txt` and re-parses autom
 ## Visual layer order (bottom → top)
 
 1. `Background.png` — cover-fit, Ken-Burns zoom
-2. `CurvedLine.png` — cover-fit (left-anchored), slides up from below + fades in (0–800 ms)
+2. **Curved line (SVG path)** — drawn on canvas from `docs/CurvedLine.svg`, left-anchored, slides up from below + fades in (0–800 ms). Fill colour controlled by the brand colour picker.
 3. `Person.png` — cover-fit, Ken-Burns zoom
 4. Title text — fades + slides from left, lines stagger in
 5. Subtitle text — fades + slides in after last title line
@@ -163,13 +165,13 @@ All full-canvas layers are drawn using **cover fit** — scaled proportionally t
 
 The larger offset difference between background (20%) and person (30%) in 9:16 preserves the parallax effect.
 
-### CurvedLine.png
+### Curved line (SVG)
 
 | Format | Anchor | Extra offset |
 |--------|--------|--------------|
 | 16:9   | Left   | none         |
-| 1:1    | Left   | none         |
-| 9:16   | Left   | 25% of canvas width left |
+| 1:1    | Left   | 10% of canvas width left |
+| 9:16   | Left   | 40% of canvas width left |
 
 ### Logo.png
 
@@ -193,15 +195,15 @@ All text uses **Geogrotesque** (loaded from `docs/fonts/` via `@font-face`), fal
 | Subtitle      | Medium (500)   | 43 px           | White `#FFFFFF`                             |
 | Baseline text | SemiBold (600) | 50 px           | White `#FFFFFF` on green `#A4CB3F`          |
 
-### 9:16 (absolute values, sized for 1080px canvas width)
+### 9:16 (absolute values, sized for 1080px canvas width — scaled ×1.25 vs. original)
 
 | Element       | Weight         | Size   | Colour                                      |
 |---------------|----------------|--------|---------------------------------------------|
-| Title         | Bold Italic    | 68 px  | White `#FFFFFF` / Green `#D4F9B0`           |
-| Subtitle      | Medium (500)   | 42 px  | White `#FFFFFF`                             |
-| Baseline text | SemiBold (600) | 48 px  | White `#FFFFFF` on green `#A4CB3F`          |
+| Title         | Bold Italic    | 85 px  | White `#FFFFFF` / active brand colour for `*highlighted*` words |
+| Subtitle      | Medium (500)   | 53 px  | White `#FFFFFF`                             |
+| Baseline text | SemiBold (600) | 60 px  | White `#FFFFFF` on active brand colour      |
 
-Font sizes in 9:16 use absolute pixel values rather than the `sy` scale factor, because `sy = 1920/1080 ≈ 1.78` would produce oversized text on the narrow 1080px canvas.
+Font sizes in 9:16 use absolute pixel values rather than the `sy` scale factor, because `sy = 1920/1080 ≈ 1.78` would produce oversized text on the narrow 1080px canvas. All values are ×1.25 the original portrait baseline for better readability on the tall canvas.
 
 ---
 
@@ -219,16 +221,16 @@ Font sizes in 9:16 use absolute pixel values rather than the `sy` scale factor, 
 | Baseline line gap    | 6 px                                | —                                  |
 | Baseline paddingX    | 11 px each side                     | —                                  |
 
-### 9:16 (absolute values on 1080 × 1920 canvas)
+### 9:16 (absolute values on 1080 × 1920 canvas — all ×1.25)
 
 | Element              | Value                              |
 |----------------------|------------------------------------|
-| Text left padding (x)| 75 px                              |
-| Title y              | 300 px                             |
-| Title line height    | 85 px                              |
-| Subtitle gap         | 65 px below last title baseline    |
-| Baseline yTop        | 850 px                             |
-| Baseline box height  | 58 px                              |
+| Text left padding (x)| 94 px                              |
+| Title y              | 375 px                             |
+| Title line height    | 106 px                             |
+| Subtitle gap         | 81 px below last title baseline    |
+| Baseline yTop        | 1063 px                            |
+| Baseline box height  | 73 px                              |
 
 ---
 
@@ -267,10 +269,22 @@ Filenames are matched **case-insensitively**. Known variants:
 - The animation resets to frame 0 before recording starts.
 - Recording stops automatically when the clip finishes (8 seconds total).
 - **Audio is included** in the export. Music is routed through the Web Audio API (`AudioContext → MediaElementSourceNode → MediaStreamDestinationNode`) so the audio track is captured alongside the canvas video.
-- Music plays **one pass only** during export (looping disabled). Looping is restored automatically for preview after export completes.
+- Music plays **one pass only** — both during export and during normal preview. Audio does not loop, consistent with the visual animation.
 
 ---
 
+## Phase 2 features
+
+| Feature | Description |
+|---|---|
+| Brand colour picker | 8 colour swatches in the sidebar; selected colour controls highlighted title text and the curved line fill |
+| Sidebar text inputs | Title, Subtitle and Baseline fields per format (16:9, 1:1, 9:16) replace manual `content.txt` editing |
+| Highlight button | Select text in the Title field and press **H** to wrap it in `*asterisks*` for green highlighting |
+| SVG curved line | `CurvedLine.png` bitmap replaced by a canvas-drawn SVG path (`docs/CurvedLine.svg`) that recolours live |
+| 9:16 text scaling | All 9:16 font sizes and positions scaled ×1.25 for better readability on the tall portrait canvas |
+| Stop button | "Reset" button renamed to "Stop" |
+| Audio single-pass | Audio no longer loops — one pass only, consistent with the visual animation |
+
 ## Known issues / next steps
 
-- [ ] Fine-tune 9:16 layout positions after visual review with real content.
+- No open issues after Phase 2.
