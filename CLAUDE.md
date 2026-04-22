@@ -6,6 +6,14 @@ Build a **browser-based animation composer** that layers assets (images, text, l
 into short animated clips, exportable as video in two aspect ratios.
 This is a **local prototype** — no backend server required; everything runs in the browser.
 
+### Phase history
+- **Phase 1** — git tag `phase-1`: base canvas renderer, watchfolder asset loading, MediaRecorder export.
+- **Phase 2** — root `index.html`: brand colour picker, sidebar text inputs, SVG curved line, 9:16 format.
+- **Phase 3** — `phase3/index.html`: CSV spreadsheet workflow, row navigator, per-row save, batch export.
+
+**Do not modify Phase 2 files** (`index.html`, `src/`, `styles/`) unless explicitly asked.
+Phase 3 lives entirely in `phase3/` and shares only `docs/fonts/` and `docs/CurvedLine.svg`.
+
 ---
 
 ## Tech Stack Preferences

@@ -4,14 +4,47 @@ Browser-based animation composer that layers assets (images, text, logo, audio) 
 
 **Phase 2 adds:** brand colour picker, sidebar text input fields (replaces `content.txt` editing), and an SVG-based curved line that recolours with the picker.
 
+**Phase 3 adds:** spreadsheet-driven workflow — load a CSV where each row is one clip, navigate rows with ◀ ▶, save edits back, and batch-export all rows × all 3 formats in one go. Lives in [`/phase3/`](phase3/).
+
 ---
 
-## How to run
+## Phase 2 — How to run
 
 1. Open `index.html` directly in **Chrome or Edge** (file:// works, no server needed).
 2. Click **Load Watch Folder** and select the `watchfolder/` directory.
 3. Press **▶ Play** to preview the animation with music.
 4. Press **⏺ Record & Export** to capture and download the clip.
+
+---
+
+## Phase 3 — How to run
+
+1. Open `phase3/index.html` in **Chrome or Edge**.
+2. Click **Load CSV** and select your spreadsheet (see `phase3/sample-clips.csv` for the format).
+3. Click **Load Shared Assets** and select the folder containing `logo.webm`, `music.mp3`, and all background/person images.
+4. Use **◀ ▶** to navigate rows — the canvas updates instantly per row.
+5. Edit text or colour, then click **Save Row** to keep changes in memory.
+6. Click **Export CSV** to download the edited spreadsheet.
+7. Click **Batch Export** to record all rows × all 3 formats automatically.
+
+### Phase 3 — CSV format
+
+One row per clip. Author in Excel or Google Sheets and export as `.csv`.
+
+```
+name,color,background,person,title_16x9,subtitle_16x9,baseline_16x9,title_1x1,subtitle_1x1,baseline_1x1,title_9x16,subtitle_9x16,baseline_9x16
+clip_001,#99cc00,bg_anna.png,person_anna.png,"Your *title*","Subtitle","Baseline",...
+```
+
+| Column | Description |
+|---|---|
+| `name` | Used as the output filename prefix (`clip_001-16x9.mp4`) |
+| `color` | Brand hex colour (`#99cc00`) — controls highlighted text and curved line |
+| `background` | Filename of the background image in the shared assets folder |
+| `person` | Filename of the person image in the shared assets folder |
+| `title_16x9` … `baseline_9x16` | Text per field per format — wrap `*words*` to highlight |
+
+Logo, music, and the curved line are **shared** across all rows (loaded once from the assets folder).
 
 > Chrome 130+ and Safari are recommended — both support H.264 MP4 export natively. Older Chrome versions export WebM VP9 instead.
 
