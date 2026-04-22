@@ -1,0 +1,468 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   main.css — AG Social Media Clips Phase 3
+   Based on Phase 2 styles. Adds row navigator, save/batch-export buttons.
+   Font paths point to ../../docs/fonts/ (one level up from phase3/).
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── Font declarations ────────────────────────────────────────────────────── */
+
+@font-face {
+  font-family: 'Geogrotesque';
+  src: url('../../docs/fonts/Geogrotesque Family/Geogrotesque-BoldItalic.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Geogrotesque';
+  src: url('../../docs/fonts/Geogrotesque Family/Geogrotesque-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Geogrotesque';
+  src: url('../../docs/fonts/Geogrotesque Family/Geogrotesque-SemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Geogrotesque';
+  src: url('../../docs/fonts/Geogrotesque Family/Geogrotesque-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Geogrotesque';
+  src: url('../../docs/fonts/Geogrotesque Family/Geogrotesque-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* ── Reset & base ─────────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background-color: #111111;
+  color: #ffffff;
+  font-family: 'Geogrotesque', sans-serif;
+  font-weight: 400;
+}
+
+/* ── Toolbar ──────────────────────────────────────────────────────────────── */
+
+#toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 16px;
+  background-color: #1e1e1e;
+  border-bottom: 1px solid #333333;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #888888;
+}
+
+/* Generic toolbar button */
+.toolbar-btn {
+  padding: 7px 12px;
+  font-family: 'Geogrotesque', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #dddddd;
+  background-color: #2e2e2e;
+  border: 1px solid #444444;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.toolbar-btn:hover:not(:disabled) {
+  background-color: #3a3a3a;
+  color: #ffffff;
+}
+
+.toolbar-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Row navigator ────────────────────────────────────────────────────────── */
+
+/* Narrow ◀ / ▶ buttons */
+.nav-btn {
+  padding: 7px 10px;
+  font-size: 11px;
+}
+
+/* Centre label showing "clip_001 · 1 / 12" */
+.row-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #cccccc;
+  min-width: 160px;
+  text-align: center;
+  padding: 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Format toggle buttons ────────────────────────────────────────────────── */
+
+.format-btn {
+  padding: 6px 12px;
+  font-family: 'Geogrotesque', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #aaaaaa;
+  background-color: #252525;
+  border: 1px solid #444444;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.format-btn:hover {
+  background-color: #333333;
+  color: #ffffff;
+}
+
+.format-btn.active {
+  background-color: #A4CB3F;
+  color: #000000;
+  border-color: #A4CB3F;
+}
+
+/* ── Hidden file inputs ───────────────────────────────────────────────────── */
+
+#csv-input,
+#assets-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.load-label {
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* ── Record / batch export button (red accent) ────────────────────────────── */
+
+.record-btn {
+  color: #ff6b6b;
+  border-color: #ff6b6b44;
+}
+
+.record-btn:hover:not(:disabled) {
+  background-color: #ff6b6b22;
+  color: #ff8888;
+}
+
+.record-btn.recording {
+  color: #ffffff;
+  background-color: #cc0000;
+  border-color: #cc0000;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+
+/* ── Main area (sidebar + canvas) ─────────────────────────────────────────── */
+
+#main-area {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Sidebar ──────────────────────────────────────────────────────────────── */
+
+#sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
+  background-color: #181818;
+  border-right: 1px solid #2e2e2e;
+}
+
+.sidebar-panel {
+  padding: 16px 14px;
+  border-bottom: 1px solid #2e2e2e;
+}
+
+.panel-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #888888;
+  margin-bottom: 4px;
+}
+
+.panel-hint {
+  font-size: 11px;
+  color: #555555;
+  margin-bottom: 10px;
+}
+
+/* ── Colour swatches ──────────────────────────────────────────────────────── */
+
+#color-swatches {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.color-swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 5px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.1s, border-color 0.15s;
+}
+
+.color-swatch:hover {
+  transform: scale(1.1);
+}
+
+.color-swatch.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 1px #ffffff44;
+}
+
+#selected-color-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+#selected-color-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+#selected-color-hex {
+  font-size: 12px;
+  font-family: 'Geogrotesque', monospace, sans-serif;
+  color: #aaaaaa;
+}
+
+/* ── Content tabs ─────────────────────────────────────────────────────────── */
+
+#content-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.content-tab {
+  flex: 1;
+  padding: 5px 0;
+  font-family: 'Geogrotesque', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #888888;
+  background-color: #222222;
+  border: 1px solid #333333;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.12s, color 0.12s;
+}
+
+.content-tab:hover {
+  background-color: #2e2e2e;
+  color: #cccccc;
+}
+
+.content-tab.active {
+  background-color: #A4CB3F;
+  color: #000000;
+  border-color: #A4CB3F;
+}
+
+/* ── Content panes ────────────────────────────────────────────────────────── */
+
+.content-pane {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.content-pane.active {
+  display: flex;
+}
+
+.field-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #666666;
+  margin-top: 4px;
+}
+
+.field-row {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.content-field {
+  width: 100%;
+  background-color: #222222;
+  color: #dddddd;
+  border: 1px solid #333333;
+  border-radius: 4px;
+  padding: 7px 9px;
+  font-family: 'Geogrotesque', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.content-field:focus {
+  border-color: #A4CB3F;
+}
+
+.content-field::placeholder {
+  color: #444444;
+}
+
+/* H button — highlights selected text with *asterisks* */
+.highlight-btn {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  font-family: 'Geogrotesque', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #000000;
+  background-color: #99cc00;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.12s;
+  margin-top: 1px;
+}
+
+.highlight-btn:hover  { background-color: #aadd11; }
+.highlight-btn:active { background-color: #88bb00; }
+
+/* ── Preview area ─────────────────────────────────────────────────────────── */
+
+#preview-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: #0a0a0a;
+  background-image:
+    linear-gradient(#1a1a1a 1px, transparent 1px),
+    linear-gradient(90deg, #1a1a1a 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+#preview-canvas {
+  display: block;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+  visibility: hidden;
+}
+
+#preview-canvas.ready {
+  visibility: visible;
+}
+
+/* ── Placeholder ──────────────────────────────────────────────────────────── */
+
+#placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  pointer-events: none;
+  text-align: center;
+  padding: 40px;
+}
+
+#placeholder p {
+  font-size: 16px;
+  color: #555555;
+}
+
+#placeholder .hint {
+  font-size: 13px;
+  color: #444444;
+  line-height: 1.8;
+}
+
+#preview-canvas.ready ~ #placeholder {
+  display: none;
+}
+
+/* ── Status bar ───────────────────────────────────────────────────────────── */
+
+#status-bar {
+  padding: 6px 20px;
+  background-color: #1a1a1a;
+  border-top: 1px solid #2a2a2a;
+  flex-shrink: 0;
+}
+
+#status-text {
+  font-size: 12px;
+  color: #777777;
+}

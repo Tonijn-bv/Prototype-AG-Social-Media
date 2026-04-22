@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AG Social Media Clips — Phase 3</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+  <!-- ── Toolbar ── -->
+  <header id="toolbar">
+
+    <!-- Step 1: load the CSV spreadsheet -->
+    <div class="toolbar-group" id="load-group">
+      <label for="csv-input" class="toolbar-btn load-label">&#128196; Load CSV</label>
+      <input type="file" id="csv-input" accept=".csv">
+
+      <!-- Step 2: load shared assets (logo.webm + music.mp3) -->
+      <label for="assets-input" class="toolbar-btn load-label">&#128193; Load Shared Assets</label>
+      <input type="file" id="assets-input" webkitdirectory multiple>
+    </div>
+
+    <!-- Row navigator: step through spreadsheet rows -->
+    <div class="toolbar-group" id="row-nav-group">
+      <button id="btn-prev" class="toolbar-btn nav-btn" disabled title="Previous row">&#9664;</button>
+      <span id="row-label" class="row-label">No CSV loaded</span>
+      <button id="btn-next" class="toolbar-btn nav-btn" disabled title="Next row">&#9654;</button>
+    </div>
+
+    <!-- Format toggle -->
+    <div class="toolbar-group" id="format-toggle-group">
+      <span class="toolbar-label">Format</span>
+      <button id="btn-16x9" class="format-btn active">16:9</button>
+      <button id="btn-1x1"  class="format-btn">1:1</button>
+      <button id="btn-9x16" class="format-btn">9:16</button>
+    </div>
+
+    <!-- Playback -->
+    <div class="toolbar-group" id="playback-group">
+      <button id="btn-play"  class="toolbar-btn" disabled>&#9654; Play</button>
+      <button id="btn-reset" class="toolbar-btn" disabled>&#9209; Stop</button>
+    </div>
+
+    <!-- Save row + export -->
+    <div class="toolbar-group" id="save-group">
+      <button id="btn-save-row"     class="toolbar-btn"       disabled>&#128190; Save Row</button>
+      <button id="btn-export-csv"   class="toolbar-btn"       disabled>&#8659; Export CSV</button>
+      <button id="btn-batch-export" class="toolbar-btn record-btn" disabled>&#9210; Batch Export</button>
+    </div>
+
+  </header>
+
+  <!-- ── Main area: sidebar + canvas ── -->
+  <div id="main-area">
+
+    <!-- ── Left sidebar ── -->
+    <aside id="sidebar">
+
+      <!-- Colour picker panel -->
+      <section class="sidebar-panel" id="color-picker-panel">
+        <h3 class="panel-title">Brand Color</h3>
+        <p class="panel-hint">Controls highlighted text &amp; curved line</p>
+
+        <div id="color-swatches">
+          <button class="color-swatch"        data-color="#003366" style="background:#003366" title="Blue Corporate"></button>
+          <button class="color-swatch active" data-color="#99cc00" style="background:#99cc00" title="Green Corporate"></button>
+          <button class="color-swatch"        data-color="#edf6cb" style="background:#edf6cb" title="Green 1"></button>
+          <button class="color-swatch"        data-color="#e2eed9" style="background:#e2eed9" title="Green 2"></button>
+          <button class="color-swatch"        data-color="#c9faaa" style="background:#c9faaa" title="Green 3"></button>
+          <button class="color-swatch"        data-color="#c3da8a" style="background:#c3da8a" title="Green 4"></button>
+          <button class="color-swatch"        data-color="#0ca76b" style="background:#0ca76b" title="Green 5"></button>
+          <button class="color-swatch"        data-color="#34754a" style="background:#34754a" title="Green 6"></button>
+        </div>
+
+        <div id="selected-color-row">
+          <span id="selected-color-dot" style="background:#99cc00"></span>
+          <span id="selected-color-hex">#99cc00</span>
+        </div>
+      </section>
+
+      <!-- Content input panel -->
+      <section class="sidebar-panel" id="content-panel">
+        <h3 class="panel-title">Content</h3>
+
+        <div id="content-tabs">
+          <button class="content-tab active" data-format="16x9">16:9</button>
+          <button class="content-tab"        data-format="1x1">1:1</button>
+          <button class="content-tab"        data-format="9x16">9:16</button>
+        </div>
+
+        <!-- 16:9 pane -->
+        <div class="content-pane active" id="pane-16x9">
+          <label class="field-label" for="title-16x9">Title</label>
+          <div class="field-row">
+            <textarea id="title-16x9" class="content-field" rows="3"
+                      placeholder="Title — wrap *words* to highlight"></textarea>
+            <button class="highlight-btn" data-field="title-16x9" title="Highlight selected text">H</button>
+          </div>
+          <label class="field-label" for="subtitle-16x9">Subtitle</label>
+          <textarea id="subtitle-16x9" class="content-field" rows="2" placeholder="Subtitle text"></textarea>
+          <label class="field-label" for="baseline-16x9">Baseline</label>
+          <textarea id="baseline-16x9" class="content-field" rows="2" placeholder="Baseline slogan"></textarea>
+        </div>
+
+        <!-- 1:1 pane -->
+        <div class="content-pane" id="pane-1x1">
+          <label class="field-label" for="title-1x1">Title</label>
+          <div class="field-row">
+            <textarea id="title-1x1" class="content-field" rows="3"
+                      placeholder="Title — wrap *words* to highlight"></textarea>
+            <button class="highlight-btn" data-field="title-1x1" title="Highlight selected text">H</button>
+          </div>
+          <label class="field-label" for="subtitle-1x1">Subtitle</label>
+          <textarea id="subtitle-1x1" class="content-field" rows="2" placeholder="Subtitle text"></textarea>
+          <label class="field-label" for="baseline-1x1">Baseline</label>
+          <textarea id="baseline-1x1" class="content-field" rows="2" placeholder="Baseline slogan"></textarea>
+        </div>
+
+        <!-- 9:16 pane -->
+        <div class="content-pane" id="pane-9x16">
+          <label class="field-label" for="title-9x16">Title</label>
+          <div class="field-row">
+            <textarea id="title-9x16" class="content-field" rows="3"
+                      placeholder="Title — wrap *words* to highlight"></textarea>
+            <button class="highlight-btn" data-field="title-9x16" title="Highlight selected text">H</button>
+          </div>
+          <label class="field-label" for="subtitle-9x16">Subtitle</label>
+          <textarea id="subtitle-9x16" class="content-field" rows="2" placeholder="Subtitle text"></textarea>
+          <label class="field-label" for="baseline-9x16">Baseline</label>
+          <textarea id="baseline-9x16" class="content-field" rows="2" placeholder="Baseline slogan"></textarea>
+        </div>
+
+      </section>
+
+    </aside><!-- /#sidebar -->
+
+    <!-- ── Preview canvas ── -->
+    <main id="preview-container">
+      <canvas id="preview-canvas"></canvas>
+
+      <div id="placeholder">
+        <p>Load a <strong>CSV file</strong> and a <strong>shared assets folder</strong> to begin.</p>
+        <p class="hint">1. Click "Load CSV" and choose your spreadsheet.<br>
+                        2. Click "Load Shared Assets" and choose the folder with logo.webm and music.mp3.<br>
+                        3. Use ◀ ▶ to navigate rows.</p>
+      </div>
+    </main>
+
+  </div><!-- /#main-area -->
+
+  <!-- ── Status bar ── -->
+  <footer id="status-bar">
+    <span id="status-text">Ready — load a CSV file to begin.</span>
+  </footer>
+
+  <!-- Scripts: loaded in dependency order -->
+  <script src="src/spreadsheet.js"></script>
+  <script src="src/composer.js"></script>
+  <script src="src/exporter.js"></script>
+  <script src="src/ui.js"></script>
+  <script src="src/main.js"></script>
+
+</body>
+</html>

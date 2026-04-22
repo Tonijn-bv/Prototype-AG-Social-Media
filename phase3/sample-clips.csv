@@ -1,0 +1,4 @@
+name,color,background,person,title_16x9,subtitle_16x9,baseline_16x9,title_1x1,subtitle_1x1,baseline_1x1,title_9x16,subtitle_9x16,baseline_9x16
+clip_001,#99cc00,background_anna.png,person_anna.png,"Votre *succès* commence ici","Subtitle text for Anna","AG Insurance",,"Titre pour *Anna*","Subtitle 1x1","AG Insurance","Titre *Anna* 9:16","Subtitle 9:16","AG Insurance"
+clip_002,#003366,background_tom.png,person_tom.png,"*Protégez* ce qui compte","Subtitle text for Tom","AG Insurance","Titre *Tom*","Subtitle 1x1","AG Insurance","Titre *Tom* 9:16","Subtitle 9:16","AG Insurance"
+clip_003,#0ca76b,background_sara.png,person_sara.png,"*Ensemble* vers l'avenir","Subtitle text for Sara","AG Insurance","Titre *Sara*","Subtitle 1x1","AG Insurance","Titre *Sara* 9:16","Subtitle 9:16","AG Insurance"
